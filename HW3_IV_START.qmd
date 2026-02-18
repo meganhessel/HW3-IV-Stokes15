@@ -102,7 +102,9 @@ c.  After running the first stage, report the F-statistic for the instrument.
 ```{r}
 # Regress proposed_turbine_3km on log_wind_power with controls 
 first_stage <- lm(proposed_turbine_3km ~ log_wind_power + 
-                      mindistlake + long_sq:lat_sq + district_id, # controls ??
+                      #log_home_val_07 + p_uni_degree + log_median_inc + log_pop_denc +
+                      mindistlake + mindistlake_sq + long_sq + lat_sq + latitude*longitude + 
+                      as.factor(district_id), # controls ??
                   data = matched_data)
 
 export_summs(first_stage, digits = 3,
@@ -125,7 +127,7 @@ first_stage_sum$fstatistic[1]
 
 **Question 2A:** Based on the instrument relevance test reported in the study, would you conclude the instrument is strong enough to be credible? Explain what a weak instrument would mean in this setting: Specifically, what would it suggest about compliance with Ontario’s Green Energy Act policy?
 
--   The F-statistic is the variance explained by wind speed / unexplained variance. In the first stage, a F-statistic less than 10 is a weak instrument, which can lead to unreliable inference. In this scenario. a weak instrument would mean wind speed are weakly correlated with turbine placement/ compliance with the Ontario’s Green Energy Act policy, leading to biased and unexplained variance in voting share results. However, the F-statistic is much larger than 10, making it a strong and credible instrument. Going forward, "compilers" are those who get turbines if and only if they have good wind resources.
+-   The F-statistic is the variance explained by wind speed / unexplained variance. In the first stage, a F-statistic less than 10 is a weak instrument, which can lead to unreliable inference. In this scenario. a weak instrument would mean wind speed is weakly correlated with turbine placement/ compliance with the Ontario’s Green Energy Act policy, leading to biased and unexplained variance in voting share results. However, the F-statistic is larger than 10, making it a strong and credible instrument. Going forward, "compilers" are those who get turbines if and only if they have good wind resources.
 
 ------------------------------------------------------------------------
 
@@ -155,7 +157,7 @@ $$LiberalVoteShare_i = \beta_0 + \beta_1 \widehat{ProposedTurbine}_i + ControlVa
 
 ```{r}
 second_stage <- lm(change_liberal ~ proposed_turbine_3km_HAT + 
-                       mindistlake + long_sq:lat_sq + district_id, 
+                       mindistlake + mindistlake_sq + long_sq + lat_sq + latitude*longitude + as.factor(district_id), 
                    data = matched_data)
 
 export_summs(second_stage, digits = 3, 
@@ -167,13 +169,13 @@ export_summs(second_stage, digits = 3,
 
 **Question 2B:** Imagine you are explaining your 2SLS findings to a policymaker in Ontario. What does the estimated coefficient on `proposed_turbine_3km_HAT` imply about the electoral impact of a local wind turbine proposal (within 3 km) on liberal vote share?
 
--   The 2SLS explains turbine placement (that is driven only by wind speed) impacts on voting shares. The estimate means there is a 18.5% decrease in liberal vote shares when wind turbine is proposed within 3km of voters, after isolating for effects driven by wind resources.
+-   The 2SLS explains turbine placement (that is driven only by wind speed) impacts on voting shares. The estimate means there is a 6.5% decrease in liberal vote shares when wind turbine is proposed within 3km of voters, after isolating for effects driven by wind resources.
 
 **Question 2C:** Explain what it means that IV identifies a LATE in the context of the wind-turbine voting study. What specific subset of observations does the second-stage 2SLS estimate apply to, and what does it imply about interpretation and generalizability?
 
 -   The second stage is isolated with precincts that have optional wind patterns (sub-population of compilers). In other words, the estimate is applied only to locations where turbine placement was determined by wind resources. Therefore, 2SLS estimates a *local* average treatment effect (LATE), not a average treatment effect (ATE) for all precincts.
 
--   This isolation reduces the impact of political, economic, and other factors on the outcome coefficent estimation. However, it limits the generalizabiliy. The generalizability of the IV estimation depends on the similarities between compilers ≈ entire population. In this circumstance, the LATE estimation does not capture any strategic or non-wind driven turbine placement. For instance, if city developers are specifically choosing wind turbine locations based on neighborhood hostility, compliance, grid connectivity, or land availability, this study does not explain those situations.
+-   This isolation reduces the impact of political, economic, and other factors on the outcome coefficent estimation. However, it limits the generalizabiliy. The generalizability of the IV estimation depends on the similarities of compilers ≈ entire population. In this circumstance, the LATE estimation does not capture any strategic or non-wind driven turbine placement. For instance, if city developers are specifically choosing wind turbine locations based on neighborhood hostility, compliance, grid connectivity, or land availability, this study does not explain those situations.
 
 ------------------------------------------------------------------------
 
@@ -184,19 +186,16 @@ export_summs(second_stage, digits = 3,
 **Question 3:** List the four key assumptions required for the IV strategy (2SLS) to identify a causal effect, and briefly explain what each one means in the context of this study. (Hint: think about what conditions a valid instrument must satisfy (relevance, exclusion,...)
 
 1.  Substantial first stage / Relevance
-    -   The instrument variable must effect the treatment.
-    -   In this study, the wind speed must effect wind turbine placement. This correlation is noted by the high F-statistic.
-2.  Independence:
+    -   The instrument variable must effect/change the treatment.
+    -   In this study, the wind speed must effect wind turbine placement. This correlation is noted by the F-statistic \> 10.
+2.  Independence / Ignorability:
     -   Instrument variable assignment is random and has no selection bias.
-    -   In this study, some precincts are more likely to have greater wind due to geographical conditions. However, these differences are not due to human selection / study design.
+    -   In this study, some precincts are more likely to have greater wind due to geographical conditions. However, these differences are not due to human selection and/or study design.
 3.  Exclusion restriction:
-    -   Instrument change outcomes (Y) must be solely through the treatment variable.
+    -   Instrument change outcomes (Y) must be solely through the treatment variable (D).
     -   In this study, the liberal voting shares are dictated by who has wind turbine proposals within 3km of voters (in areas with wind resources).
-4.  Exchangeability: IDK
-    -   Instrument is independent of and has no direct effect on the potential outcomes so that the outcomes are same across different levels of the instrument. ???
-    -   
-5.  Monotonicity: IDK
-    -   There are no defiers in the population (individuals/communities that alwas do the oppoiste of what the instrument suggest)
+4.  Monotonicity:
+    -   There are no defiers in the population (individuals/communities that alway do the oppoiste of what the instrument suggest).
     -   In this study, defiers would be communities that will never put wind turbines up no matter if they have optimal wind patterns. The Green Energy Act took away choice, and communities no longer had a choice to be defiers or not.
 
 ------------------------------------------------------------------------
@@ -217,8 +216,7 @@ Syntax for specifying 2SLS using `ivreg()`:
 ```{r}
   
 fit_2sls <- ivreg(change_liberal ~ proposed_turbine_3km + 
-                      mindistlake + long_sq:lat_sq + district_id | 
-                      log_wind_power +  mindistlake + long_sq:lat_sq + district_id, 
+                      mindistlake + mindistlake_sq + long_sq + lat_sq + latitude*longitude + as.factor(district_id) | log_wind_power +  mindistlake + mindistlake_sq + long_sq + lat_sq + latitude*longitude + as.factor(district_id),
                   data = matched_data
                   )
 
@@ -234,7 +232,7 @@ export_summs(fit_2sls, digits = 3,
 
 1.  Informed voting test
 
-    Attempt to understand if voters were informed about the specific governmental responsibility in terms of the wind policy. Found that the voters were mostly informed and their voting behavior in the electoral votes was a reflection of their beliefs about the climate policy. Therefore, treatment (proposed wind turbines) does influence outcomes (liberal voting shares).
+    Attempted to understand if voters were informed about the specific governmental responsibility in terms of the wind policy. Found that the voters were mostly informed and their voting behavior in the electoral votes was a reflection of their beliefs about the climate policy. Therefore, treatment (proposed wind turbines) does influence outcomes (liberal voting shares).
 
 2.  Distance Gradient Analysis
 
