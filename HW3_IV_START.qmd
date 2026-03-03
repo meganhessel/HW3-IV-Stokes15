@@ -89,8 +89,6 @@ Intuition for Using an Instrument:
 
 ### Part 2: Two-Stage Least Squares (2SLS) Step-Wise Implementation
 
-**COME BACK TO AND CHECK WITH OTHERS!!! D**
-
 #### 2A. First-Stage Estimation: Regress the treatment ($D$) on the instrument ($Z$)
 
 $$D_i = \alpha_0 + \alpha_1 Z_i $$
@@ -169,7 +167,7 @@ export_summs(second_stage, digits = 3,
 
 **Question 2B:** Imagine you are explaining your 2SLS findings to a policymaker in Ontario. What does the estimated coefficient on `proposed_turbine_3km_HAT` imply about the electoral impact of a local wind turbine proposal (within 3 km) on liberal vote share?
 
--   The 2SLS explains turbine placement (that is driven only by wind speed) impacts on voting shares. The estimate means there is a 6.5% decrease in liberal vote shares when wind turbine is proposed within 3km of voters, after isolating for effects driven by wind resources.
+-   The 2SLS explains that local turbine placement (that is driven only by wind speed) impacts on voting shares. The estimate means there is a statistically significant (not due to chance) decrease in liberal vote shares when local wind turbine is proposed within 3km of voters, after isolating for effects driven by wind resources.
 
 **Question 2C:** Explain what it means that IV identifies a LATE in the context of the wind-turbine voting study. What specific subset of observations does the second-stage 2SLS estimate apply to, and what does it imply about interpretation and generalizability?
 

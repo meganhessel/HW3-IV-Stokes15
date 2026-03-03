@@ -212,7 +212,6 @@ window.Quarto = {
 </section>
 <section id="part-2-two-stage-least-squares-2sls-step-wise-implementation" class="level3">
 <h3 class="anchored" data-anchor-id="part-2-two-stage-least-squares-2sls-step-wise-implementation">Part 2: Two-Stage Least Squares (2SLS) Step-Wise Implementation</h3>
-<p><strong>COME BACK TO AND CHECK WITH OTHERS!!! D</strong></p>
 <section id="a.-first-stage-estimation-regress-the-treatment-d-on-the-instrument-z" class="level4">
 <h4 class="anchored" data-anchor-id="a.-first-stage-estimation-regress-the-treatment-d-on-the-instrument-z">2A. First-Stage Estimation: Regress the treatment (<span class="math inline">\(D\)</span>) on the instrument (<span class="math inline">\(Z\)</span>)</h4>
 <p><span class="math display">\[D_i = \alpha_0 + \alpha_1 Z_i \]</span></p>
@@ -337,7 +336,7 @@ window.Quarto = {
 <h4 class="anchored" data-anchor-id="interpreting-the-2sls-estimate">Interpreting the 2SLS Estimate</h4>
 <p><strong>Question 2B:</strong> Imagine you are explaining your 2SLS findings to a policymaker in Ontario. What does the estimated coefficient on <code>proposed_turbine_3km_HAT</code> imply about the electoral impact of a local wind turbine proposal (within 3 km) on liberal vote share?</p>
 <ul>
-<li>The 2SLS explains turbine placement (that is driven only by wind speed) impacts on voting shares. The estimate means there is a 6.5% decrease in liberal vote shares when wind turbine is proposed within 3km of voters, after isolating for effects driven by wind resources.</li>
+<li>The 2SLS explains that local turbine placement (that is driven only by wind speed) impacts on voting shares. The estimate means there is a statistically significant (not due to chance) decrease in liberal vote shares when local wind turbine is proposed within 3km of voters, after isolating for effects driven by wind resources.</li>
 </ul>
 <p><strong>Question 2C:</strong> Explain what it means that IV identifies a LATE in the context of the wind-turbine voting study. What specific subset of observations does the second-stage 2SLS estimate apply to, and what does it imply about interpretation and generalizability?</p>
 <ul>
